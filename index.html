@@ -1,137 +1,320 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لعبة تعليمية في الرياضيات</title>
+  <title>لعبة الرياضيات</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      text-align: center;
-      background-image: url('background.jpg'); /* استبدل بـ URL الخلفية */
+      background-image: url('background.jpg'); /* خلفية اللعبة */
       background-size: cover;
-      background-position: center;
-      color: white;
-      direction: rtl;
+      text-align: center;
+      color: #333;
     }
-    h1 {
+
+    #title {
       margin-top: 20px;
-      text-shadow: 2px 2px 4px #000;
+      font-size: 32px;
+      color: black; /* لون العنوان */
     }
-    .question {
+
+    #question-container {
+      margin: 20px;
       font-size: 28px;
-      margin: 20px 0;
-      padding: 20px;
-      background-color: rgba(0, 0, 0, 0.7);
-      border-radius: 10px;
-      display: inline-block;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      color: #0040ff; /* لون السؤال */
     }
-    .options button {
-      margin: 10px;
-      padding: 15px 25px;
-      font-size: 22px;
+
+    .choices {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .choice {
+      background-color: #fff;
+      padding: 10px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
       cursor: pointer;
-      background-color: #ffd700;
-      border: none;
-      border-radius: 10px;
-      box-shadow: 0 0 5px #000;
+      font-size: 22px;
+      width: 120px;
+      text-align: center;
       transition: background-color 0.3s ease;
     }
-    .options button:active {
-      background-color: #ffa500;
+
+    .choice:hover {
+      background-color: #f2f2f2;
     }
-    .options button:hover {
-      background-color: #ffbf00;
-    }
-    .result {
-      margin-top: 20px;
-      font-size: 26px;
-      font-weight: bold;
-      padding: 20px;
-      border-radius: 15px;
-      background-color: rgba(255, 255, 255, 0.8);
-      color: #333;
+
+    #result {
+      margin-top: 10px;
+      font-size: 20px;
+      color: white;
+      background-color: #444;
+      padding: 10px;
+      border-radius: 5px;
       display: inline-block;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     }
-    .result:active {
-      background-color: rgba(200, 200, 200, 0.8);
-      color: #000;
+
+    #score-box {
+      margin: 20px;
+      font-size: 22px;
+      background-color: #fafafa;
+      padding: 10px;
+      border-radius: 5px;
+      display: inline-block;
+    }
+
+    .circle {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background-color: #ffd700;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px auto;
+      font-size: 30px;
+    }
+
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 80%;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+      font-size: 18px;
+    }
+
+    .correct-answer {
+      background-color: #e9fce9; /* لون الإجابات الصحيحة */
+    }
+
+    .wrong-answer {
+      background-color: #fce9e9; /* لون الإجابات الخاطئة */
+    }
+
+    /* إضافة التنسيق للنص في أسفل الصفحة */
+    #credits {
+      position: fixed;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      color: #fff;
+      background-color: rgba(0, 0, 0, 0.7); /* خلفية رمادية داكنة */
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    #group-name-box {
+      margin-top: 20px;
+      font-size: 22px;
+    }
+
+    #group-name {
+      font-size: 20px;
+      padding: 8px;
+      border-radius: 5px;
+    }
+
+    #start-button {
+      font-size: 22px;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    #start-button:hover {
+      background-color: #45a049;
+    }
+
+    /* إضافة اسم المطور أسفل الجدول في نافذة النتائج */
+    #developer-credit {
+      text-align: center;
+      font-size: 12px;
+      color: #fff;
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 5px;
+      border-radius: 5px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>لعبة تعليمية في الرياضيات</h1>
-  <div id="game">
-    <div class="question" id="question">Loading...</div>
-    <div class="options" id="options"></div>
-    <div class="result" id="result"></div>
-  </div>
 
-  <!-- الأصوات -->
-  <audio id="correctSound" src="correct.mp3"></audio>
-  <audio id="wrongSound" src="wrong.mp3"></audio>
+<div id="title">ترتيب العمليات الحسابية</div>
 
-  <script>
-    const questions = [
-      { q: "5 + 9 * 2", a: 23, options: [18, 23, 20, 25] },
-      { q: "10 / 2 + 6", a: 11, options: [10, 11, 12, 9] },
-      { q: "7 * 3 - 4", a: 17, options: [17, 15, 20, 19] },
-      { q: "8 + 12 / 4", a: 11, options: [11, 10, 12, 9] },
-      { q: "6 * 6 - 10", a: 26, options: [24, 26, 28, 22] }
-    ];
+<!-- صندوق إدخال اسم المجموعة -->
+<div id="group-name-box">
+  <label for="group-name">أدخل اسم المجموعة:</label>
+  <input type="text" id="group-name" placeholder="اسم المجموعة">
+  <button id="start-button" onclick="startGame()">بدء اللعبة</button>
+</div>
 
-    let currentQuestion = 0;
-    let score = 0;
-    const questionElement = document.getElementById('question');
-    const optionsElement = document.getElementById('options');
-    const resultElement = document.getElementById('result');
-    const correctSound = document.getElementById('correctSound');
-    const wrongSound = document.getElementById('wrongSound');
+<div id="question-container"></div>
+<div id="result"></div>
+<div id="score-box">النقاط: <span id="score">٠</span> / ٥</div>
 
-    function loadQuestion() {
-      if (currentQuestion < questions.length) {
-        const q = questions[currentQuestion];
-        questionElement.textContent = q.q;
-        optionsElement.innerHTML = '';
-        resultElement.textContent = '';
+<audio id="correct-sound" src="correct.mp3"></audio>
+<audio id="wrong-sound" src="wrong.mp3"></audio>
 
-        q.options.forEach(option => {
-          const button = document.createElement('button');
-          button.textContent = option;
-          button.onclick = () => checkAnswer(option, button);
-          optionsElement.appendChild(button);
-        });
+<script>
+  const questions = [
+    { question: "٤ + ٧ × ٢ =", choices: [18, 20, 14, 22], correctAnswer: 18 },
+    { question: "٢ × (٦ + ٣) - ٥ =", choices: [13, 12, 15, 10], correctAnswer: 13 },
+    { question: "٩ + (٣)<sup>٣</sup> ÷ ٣ =", choices: [12, 15, 10, 11], correctAnswer: 12 },
+    { question: "٥ × ٢ + (٤)<sup>2</sup> - (١٢ + ٣) =", choices: [11, 14, 13, 10], correctAnswer: 11 },
+    { question: "(٣)<sup>3</sup> + (٣٢ ÷ ٤ - ٢) - ٨ =", choices: [25, 15, 12, 11], correctAnswer: 25 }
+  ];
+
+  let currentQuestionIndex = 0;
+  let score = 0;
+  const userAnswers = [];
+  let groupName = "";
+
+  function convertToArabicNumber(num) {
+    return num.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+  }
+
+  function convertToArabicSuperscript(num) {
+    return num.toString().replace(/<sup>(\d+)<\/sup>/g, (match, p1) => `<sup>${convertToArabicNumber(p1)}</sup>`);
+  }
+
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  function playSound(correct) {
+    const sound = document.getElementById(correct ? 'correct-sound' : 'wrong-sound');
+    sound.play();
+  }
+
+  function loadQuestion() {
+    const currentQuestion = questions[currentQuestionIndex];
+    const questionContainer = document.getElementById('question-container');
+    const resultContainer = document.getElementById('result');
+    resultContainer.innerHTML = '';
+
+    const shuffledChoices = shuffle([...currentQuestion.choices]);
+
+    questionContainer.innerHTML = `
+      <div>${convertToArabicSuperscript(currentQuestion.question)}</div>
+      <div class="choices">
+        ${shuffledChoices.map(choice => `
+          <div class="choice" onclick="checkAnswer(${choice}, this)">${convertToArabicNumber(choice)}</div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  function checkAnswer(selectedAnswer, element) {
+    const currentQuestion = questions[currentQuestionIndex];
+    const resultContainer = document.getElementById('result');
+
+    // تغيير اللون إلى الذهبي عند الضغط على الإجابة
+    element.style.backgroundColor = '#FFD700';
+
+    // تعطيل باقي الإجابات
+    const allChoices = document.querySelectorAll('.choice');
+    allChoices.forEach(choice => {
+      choice.style.pointerEvents = 'none';
+    });
+
+    if (selectedAnswer === currentQuestion.correctAnswer) {
+      score++;
+      resultContainer.style.backgroundColor = 'green';
+      resultContainer.innerText = 'إجابة صحيحة';
+      playSound(true);
+    } else {
+      resultContainer.style.backgroundColor = 'red';
+      resultContainer.innerText = 'إجابة خاطئة';
+      playSound(false);
+    }
+
+    userAnswers.push({
+      question: currentQuestion.question,
+      selectedAnswer: selectedAnswer,
+      correctAnswer: currentQuestion.correctAnswer
+    });
+
+    document.getElementById('score').innerText = convertToArabicNumber(score);
+
+    setTimeout(() => {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
+        loadQuestion();
       } else {
         showFinalScore();
       }
+    }, 1000);
+  }
+
+  function showFinalScore() {
+    document.body.innerHTML = '';
+
+    const finalScoreContainer = document.createElement('div');
+    finalScoreContainer.id = 'final-score-container';
+    finalScoreContainer.innerHTML = `
+      <div>النتيجة النهائية</div>
+      <div class="circle">${convertToArabicNumber(score)} / ٥</div>
+    `;
+
+    const table = document.createElement('table');
+    table.innerHTML = `
+      <tr>
+        <th>السؤال</th>
+        <th>إجابتك</th>
+        <th>الإجابة الصحيحة</th>
+      </tr>
+      ${userAnswers.map(answer => `
+        <tr class="${answer.selectedAnswer === answer.correctAnswer ? 'correct-answer' : 'wrong-answer'}">
+          <td>${convertToArabicSuperscript(answer.question)}</td>
+          <td>${convertToArabicNumber(answer.selectedAnswer)}</td>
+          <td>${convertToArabicNumber(answer.correctAnswer)}</td>
+        </tr>
+      `).join('')}
+    `;
+
+    document.body.appendChild(finalScoreContainer);
+    document.body.appendChild(finalScoreContainer);
+    document.body.appendChild(table);
+
+    // إضافة اسم المطور أسفل النتيجة
+    const developerCredit = document.createElement('div');
+    developerCredit.id = 'developer-credit';
+    developerCredit.innerText = 'إعداد: مروى الحجرية';
+    document.body.appendChild(developerCredit);
+  }
+
+  function startGame() {
+    groupName = document.getElementById('group-name').value;
+    if (!groupName) {
+      alert('الرجاء إدخال اسم المجموعة');
+      return;
     }
 
-    function checkAnswer(selected, button) {
-      const correctAnswer = questions[currentQuestion].a;
-      if (selected === correctAnswer) {
-        resultElement.textContent = "إجابة صحيحة!";
-        correctSound.play();
-        score++;
-      } else {
-        resultElement.textContent = "إجابة خاطئة، حاول مرة أخرى.";
-        wrongSound.play();
-      }
-      button.style.backgroundColor = selected === correctAnswer ? '#28a745' : '#dc3545';
-      button.style.color = 'white';
-      currentQuestion++;
-      setTimeout(loadQuestion, 2000);
-    }
-
-    function showFinalScore() {
-      questionElement.textContent = "لقد أكملت جميع المسائل!";
-      optionsElement.innerHTML = '';
-      resultElement.innerHTML = `أحرزت ${score} من 5 نقاط.`;
-      resultElement.style.color = score >= 3 ? 'green' : 'red';
-    }
-
+    document.getElementById('group-name-box').style.display = 'none';
     loadQuestion();
-  </script>
+  }
+</script>
+
+<!-- اسم المطور في الأسفل -->
+<div id="credits">إعداد: مروى الحجرية</div>
+
 </body>
 </html>
